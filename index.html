@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rohan's Resume & Biodata</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume & Biodata</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            line-height: 1.6;
+            color: #050505;
+            background-color: #f4f4f4ad;
+        }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .popup-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transform: scale(0.7);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .popup-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .popup-overlay.show .popup-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .popup-close {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            margin-top: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .popup-close:hover {
+            background-color: #08b9959a;
+        }
+
+        .popup-title {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .popup-text {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s, transform 0.5s;
+        }
+
+        .container.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .navigation {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .nav-button {
+            padding: 0.5rem 1rem;
+            margin: 0 0.5rem;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.2s, background-color 0.3s;
+        }
+
+        .nav-button:hover {
+            background-color: #00b395;
+            transform: scale(1.05);
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        h1,
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        h1 {
+            text-align: center;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 0.5rem;
+        }
+
+        .section {
+            margin-bottom: 2rem;
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: opacity 0.5s, transform 0.5s;
+        }
+
+        .section.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .experience-item,
+        .education-item {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 4px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .experience-item:hover,
+        .education-item:hover {
+            transform: translateY(-15px);
+            box-shadow: 0 5px 15px rgba(245, 8, 8, 0.1);
+        }
+
+        .skills-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .skill-tag {
+            background-color: #e9ecef;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            transition: transform 0.2s, background-color 0.3s;
+            cursor: pointer;
+        }
+
+        .skill-tag:hover {
+            transform: scale(1.1);
+            background-color: #007bff;
+            color: white;
+        }
+
+        .bio-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .bio-label {
+            font-weight: bold;
+            color: #666;
+        }
+
+        .profile-summary {
+            font-style: italic;
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        /* Toast Notification Style */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #333;
+            color: white;
+            padding: 1rem;
+            border-radius: 4px;
+            display: none;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Loading animation */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: #007bff;
+            animation: loading 2s linear infinite;
+        }
+
+        @keyframes loading {
+            0% {
+                width: 0;
+            }
+
+            50% {
+                width: 100%;
+            }
+
+            100% {
+                width: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="welcomePopup" class="popup-overlay">
+        <div class="popup-content">
+            <h2 class="popup-title">Welcome to Rohan's Profile</h2>
+            <p class="popup-text">
+                Explore my professional journey and personal details.
+                Navigate between Resume and Biodata pages to learn more about my experience, skills, and background.
+            </p>
+            <button class="popup-close" onclick="closeWelcomePopup()">Continue</button>
+        </div>
+    </div>
+    <div class="navigation">
+        <button class="nav-button" onclick="showPage('resume')">Resume</button>
+        <button class="nav-button" onclick="showPage('biodata')">Biodata</button>
+    </div>
+
+    <div id="resume" class="page active container">
+        <h1>Rohan Lagarwar</h1>
+        <p class="profile-summary">Experienced software developer with a passion for creating innovative solutions and a
+            track record of delivering high-quality projects.</p>
+
+        <div class="section">
+            <h2>Projects</h2>
+            <div class="experience-item">
+                <h3>Cinepredictor</h3>
+                <p>2024 June</p>
+                <ul>
+                    <li>Implemented AI models to predict movies based on user's watch history</li>
+                    <li>Managed the project using git version control system</li>
+                    <li>Implemented CI/CD pipeline reducing deployment time by 40%</li>
+                </ul>
+            </div>
+            <div class="experience-item">
+                <h3>USER RDBMS</h3>
+                <p>2024 May</p>
+                <ul>
+                    <li>Developed a user relational database management system</li>
+                    <li>Optimized database queries improving performance by 30%</li>
+                    <li>Collaborated with UX team for interface improvements</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Education</h2>
+            <div class="education-item">
+                <h3>Bachelor's of Computer Science</h3>
+                <p>CMR Institute of Technology - 2024-26</p>
+            </div>
+            <div class="education-item">
+                <h3>12th Grade</h3>
+                <p>BKVM School</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Skills</h2>
+            <div class="skills-list">
+                <span class="skill-tag">Python</span>
+                <span class="skill-tag">Java</span>
+                <span class="skill-tag">C++</span>
+                <span class="skill-tag">C</span>
+                <span class="skill-tag">MySQL</span>
+                <span class="skill-tag">Relational databases</span>
+                <span class="skill-tag">Git</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="biodata" class="page container">
+        <h1>Personal Biodata</h1>
+
+        <div class="section">
+            <div class="bio-grid">
+                <div class="bio-label">Full Name</div>
+                <div>Rohan Lagarwar</div>
+
+                <div class="bio-label">Date of Birth</div>
+                <div>March 31, 2004</div>
+
+                <div class="bio-label">Place of Birth</div>
+                <div>Biratnagar,Nepal</div>
+
+                <div class="bio-label">Nationality</div>
+                <div>Nepali</div>
+
+                <div class="bio-label">Marital Status</div>
+                <div>Single</div>
+
+                <div class="bio-label">Blood Group</div>
+                <div>A-</div>
+
+                <div class="bio-label">Height</div>
+                <div>5'10.5" (178 cm)</div>
+
+                <div class="bio-label">Weight</div>
+                <div>165 lbs (75 kg)</div>
+
+                <div class="bio-label">Languages Known</div>
+                <div>English, Hindi,Nepali</div>
+
+                <div class="bio-label">Current Address</div>
+                <div>CMRIT Hostel, Bengaluru 560037, Karnatka</div>
+
+                <div class="bio-label">Phone</div>
+                <div>+91 7260044371</div>
+
+                <div class="bio-label">Email</div>
+                <div>rola22cs@cmrit.ac.in</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                const popup = document.getElementById('welcomePopup');
+                popup.classList.add('show');
+            }, 500);
+        });
+
+        function closeWelcomePopup() {
+            const popup = document.getElementById('welcomePopup');
+            popup.classList.remove('show');
+            setTimeout(() => {
+                popup.style.display = 'none';
+            }, 300);
+        }
+        // Show loading animation on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.querySelector('.loading').style.display = 'none';
+                document.querySelectorAll('.container').forEach(container => {
+                    container.classList.add('show');
+                });
+                animateSections();
+            }, 1000);
+        });
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+                page.classList.remove('show');
+            });
+            const newPage = document.getElementById(pageId);
+            newPage.classList.add('active');
+            setTimeout(() => {
+                newPage.classList.add('show');
+                animateSections();
+            }, 100);
+        }
+
+        function animateSections() {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach((section, index) => {
+                setTimeout(() => {
+                    section.classList.add('show');
+                }, index * 200);
+            });
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.display = 'block';
+
+            // Add animation class
+            toast.style.animation = 'slideIn 0.5s ease-out';
+
+            // Hide toast after 3 seconds
+            setTimeout(() => {
+                toast.style.display = 'none';
+                toast.style.animation = '';
+            }, 3000);
+        }
+
+        // Add hover effect to bio-grid items
+        document.querySelectorAll('.bio-grid div:not(.bio-label)').forEach(item => {
+            item.addEventListener('click', () => {
+                showToast('Copied to clipboard!');
+                // Simulate copying to clipboard
+                navigator.clipboard.writeText(item.textContent.trim());
+            });
+        });
+    </script>
+</body>
+
+</html>
